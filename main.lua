@@ -12,6 +12,7 @@ ball.stick = false
 ball.speedX = 0
 ball.speedY = 0
 
+
 function start()
   ball.stick = true
 end
@@ -66,8 +67,15 @@ function love.update(dt)
   if ball.y > height then
     start()
   end
-  
-  
+  -- Ball bounce on the pad
+  local posCollisionPad = pad.y - (pad.height / 2) - ball.radius
+  if ball.y > posCollisionPad then
+    local dist = math.abs(pad.x - ball.x)
+    if dist < pad.width / 2 then
+        ball.speedY = 0 - ball.speedY
+        ball.y = posCollisionPad
+    end
+  end
 end
 
 function love.draw()
