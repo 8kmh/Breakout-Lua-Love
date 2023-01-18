@@ -12,9 +12,23 @@ ball.stick = false
 ball.speedX = 0
 ball.speedY = 0
 
+local brick = {}
+local level = {}
+
 
 function start()
   ball.stick = true
+  
+  level = {}
+  local l,c
+  
+  for l=1, 6 do
+    level[l] = {}
+    for c=1, 15 do 
+      level[l][c] = 1
+      
+    end
+  end
 end
 
 
@@ -22,6 +36,9 @@ end
 function love.load()
   width = love.graphics.getWidth()
   height = love.graphics.getHeight()
+  
+  brick.width = width / 15
+  brick.height = 25
   
   -- Set the pad to the bottom of the screen
   pad.y = height - (pad.height / 2)
@@ -43,6 +60,16 @@ function love.update(dt)
   else 
     ball.x = ball.x + (ball.speedX * dt)
     ball.y = ball.y + (ball.speedY * dt)
+  end
+  -- Check if the ball collide with a brick 
+  local c = math.floor(ball.x / brick.width) + 1
+  local l = math.floor(ball.y / brick.height) + 1 
+  
+  if l >= 1 and l <= #level and c >= 1 and c <= 15 then
+    if level[l][c] == 1 then
+      ball.speedY = 0 - ball.speedY
+      level[l][c] = 0
+    end
   end
   
   -- Bounce on the right wall
@@ -79,6 +106,21 @@ function love.update(dt)
 end
 
 function love.draw()
+  
+  local l,c
+  local bx, by = 0,0
+  for l=1, 6 do
+    bx = 0
+    for c=1, 15 do
+      if level[l][c] == 1 then
+        -- Draw a brick
+        love.graphics.rectangle("fill", bx + 1, by + 1, brick.width - 2, brick.height - 2)
+      end
+      bx = bx + brick.width
+    end
+    by = by + brick.height
+  end
+  
   love.graphics.rectangle("fill", pad.x - (pad.width / 2), pad.y - (pad.height / 2), pad.width, pad.height)
   love.graphics.circle("fill", ball.x, ball.y, ball.radius)
 end
@@ -86,7 +128,7 @@ end
 function love.mousepressed(x, y, n)
   if ball.stick == true then 
     ball.stick = false
-    ball.speedX = -200
+    ball.speedX = 200
     ball.speedY = -200
   end
 end
